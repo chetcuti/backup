@@ -1,0 +1,31 @@
+export MAIN_BACKUP_FOLDER='/root/backup'
+RESTIC_EXECUTABLE='/usr/bin/restic'
+
+export RESTIC_REPOSITORY='/mnt/nas/backups/backup_name'
+export RESTIC_PASSWORD='xxx'
+# export B2_ACCOUNT_ID='xxx'
+# export B2_ACCOUNT_KEY='xxx'
+# export RESTIC_REPOSITORY='b2:repo:dir'
+# export RESTIC_PASSWORD='xxx'
+
+RESTIC_EXCLUDE_FILE="$MAIN_BACKUP_FOLDER/backup.excludes"
+RESTIC_BACKUP_ARGUMENTS="/etc /home /opt /root /mnt/archive /var/spool --exclude-caches --exclude-file=$RESTIC_EXCLUDE_FILE"
+or
+RESTIC_BACKUP_ARGUMENTS="/home/{{ server_standard_user }} --exclude-caches --exclude-file=$RESTIC_EXCLUDE_FILE"
+
+RESTIC_MOUNT_FOLDER='/mnt/restic'
+
+##################################################
+
+# main restic commands
+# RESTIC_OPTIONS="init"
+RESTIC_OPTIONS="-v backup $RESTIC_BACKUP_ARGUMENTS"
+# RESTIC_OPTIONS="mount $RESTIC_MOUNT_FOLDER"
+# RESTIC_OPTIONS="rebuild-index"
+# RESTIC_OPTIONS="snapshots"
+
+# some restore command examples
+# RESTIC_OPTIONS="-v -r $RESTIC_REPOSITORY restore latest --verify --target /home/{{ server_standard_user }}/old-computer-restore-this --exclude /home/{{ server_standard_user }}/docs/Dropbox --exclude /home/{{ server_standard_user }}/docs/nextcloud --exclude /mnt/archive"
+# RESTIC_OPTIONS="-v -r $RESTIC_REPOSITORY restore latest --verify --target /home/{{ server_standard_user }}/old-computer-restore-this-thunderbird-only --include /home/{{ server_standard_user }}/.thunderbird"
+
+export RESTIC_FULL_COMMAND="$RESTIC_EXECUTABLE $RESTIC_OPTIONS"

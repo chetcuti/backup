@@ -1,0 +1,8 @@
+*           text=auto   eol=lf
+
+*.config    text
+*.excludes  text
+*.pre	    text
+*.post	    text
+*.sh	    text
+

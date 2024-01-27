@@ -1,0 +1,4 @@
+# restart some docker containers
+cd ~/docker && sudo -H -u {{ server_standard_user }} docker-compose up -d
+cd $MAIN_BACKUP_FOLDER
+

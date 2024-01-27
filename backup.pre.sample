@@ -1,0 +1,39 @@
+BACKUP_FILENAME_DATE=$(date +"%Y%m%d-%H%M%S") 
+ZIP_FILE_PASSWORD='password'
+
+# make sure the NAS HD is awake
+ls /mnt/nas
+
+# export list of installed packages (non-AUR)
+pacman -Qqne > /tmp/installed-packages-pacman.txt
+
+# export list of installed packages (AUR)
+pacman -Qqem > /tmp/installed-packages-aur.txt
+
+# export list of installed flatpaks
+flatpak list > /tmp/installed-packages-flatpak.txt
+
+# export list of installed snaps
+snap list > /tmp/installed-packages-snap.txt
+
+# export list of gnome extensions (global)
+ls -lAh /usr/share/gnome-shell/extensions > /tmp/gnome-extensions-global.txt
+
+# export list of gnome extensions ({{ server_standard_user }})
+ls -lAh /home/{{ server_standard_user }}/.local/share/gnome-shell/extensions > /tmp/gnome-extensions-{{ server_standard_user }}.txt
+
+# copy the restic executable
+cp -n /root/bin/restic_* /mnt/nas/backups
+
+# create a password protected archive with all files that are needed to get up-and-running
+tar --exclude='/root/bin/restic*' -cf /root/files-needed-to-get-up-and-running.tar /etc/fstab /home/{{ server_standard_user }}/.ssh/ /root/backup/ /root/bin/ /root/.smbcredentials-hass /root/.smbcredentials-nas /root/.zshrc /tmp/gnome-extensions-global.txt /tmp/gnome-extensions-{{ server_standard_user }}.txt /tmp/installed-packages-aur.txt /tmp/installed-packages-flatpak.txt /tmp/installed-packages-pacman.txt /tmp/installed-packages-snap.txt /var/spool/cron/
+7za a -tzip -p$ZIP_FILE_PASSWORD -mem=AES256 /root/files-needed-to-get-up-and-running-$BACKUP_FILENAME_DATE.zip /root/files-needed-to-get-up-and-running.tar
+rm /root/files-needed-to-get-up-and-running.tar
+mv /root/files-needed-to-get-up-and-running-$BACKUP_FILENAME_DATE.zip /mnt/nas/backups
+
+# shutdown some docker containers
+cd ~/docker && sudo -H -u {{ server_standard_user }} docker-compose down
+/usr/bin/git add .
+/usr/bin/git commit -m 'Regularly Scheduled Backup'
+/usr/bin/git push && curl -fsS -m 10 --retry 5 http://status.example.com/ping/xxx > /dev/null
+cd $MAIN_BACKUP_FOLDER

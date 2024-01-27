@@ -1,0 +1,13 @@
+/home/{{ server_standard_user }}/.aptitude
+/home/{{ server_standard_user }}/.local/share/Trash
+/home/{{ server_standard_user }}/.wine
+/home/{{ server_standard_user }}/download
+/root/.aptitude
+/root/.local/share/Trash
+/root/.oh-my-zsh
+.cache
+.Trash-*
+__pycache__
+Cache
+lost+found
+tmp
